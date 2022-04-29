@@ -4,7 +4,7 @@ const hashPassword = require('../hashPassword');
 const knex = require('../connection');
 
 const login = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, stayConnected } = req.body;
 
     if (!email || !password) {
         return res.status(404).json({ message: 'É obrigatório email e senha' });
@@ -23,7 +23,9 @@ const login = async (req, res) => {
             return res.status(400).json({ message: 'Email ou senha incorretos.' });
         }
 
-        const token = jwt.sign({ id: user.id }, hashPassword, { expiresIn: '8h' });
+        const token = stayConnected 
+        ? jwt.sign({ id: user.id }, hashPassword) 
+        : jwt.sign({ id: user.id }, hashPassword, { expiresIn: '2h' });
 
         const { password: _, ...userData } = user;
 

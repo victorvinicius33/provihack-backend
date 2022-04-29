@@ -2,34 +2,20 @@ const bcrypt = require('bcrypt');
 const knex = require('../connection');
 
 const registerUser = async (req, res) => {
-    const { name, email, password } = req.body;
-
-    if (!name) {
-        return res.status(404).json({ message: 'O campo nome é obrigatório.' });
-    }
-
-    if (!email) {
-        return res.status(404).json({ message: 'O campo email é obrigatório.' });
-    }
-
-    if (!password) {
-        return res.status(404).json({ message: 'O campo senha é obrigatório.' });
-    }
+    const { name, email, cpf, cnpj, address, password, groupcategory } = req.body;
 
     try {
-        const checkIfEmailAlreadyExists = await knex('users')
-            .where('email', email)
-            .returning('*');
-
-        if (checkIfEmailAlreadyExists.length > 0) {
-            return res.status(400).json({ message: 'O email já existe.' });
-        }
-
         const encryptedPassword = await bcrypt.hash(password, 10);
 
         const novoUsuario = await knex('users')
             .insert({
-                name, email, password: encryptedPassword
+                name, 
+                email, 
+                cpf, 
+                cnpj, 
+                address, 
+                password: encryptedPassword,
+                groupcategory
             })
             .returning('*');
 
@@ -44,10 +30,10 @@ const getProfile = async (req, res) => {
 }
 
 const updateProfile = async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, cpf, cnpj, address, password, groupcategory } = req.body;
     const { id } = req.user;
 
-    if (!name && !email && !password) {
+    if (!name && !email && !cpf && !cnpj && !address && !password && !groupcategory) {
         return res.status(404).json({ message: 'É obrigatório informar ao menos um campo para atualização.' });
     }
 
@@ -58,16 +44,6 @@ const updateProfile = async (req, res) => {
             return res.status(400).json({ message: 'Não foi possível encontrar o usuário.' });
         }
 
-        if (email) {
-            if (email !== req.user.email) {
-                const checkIfEmailAlreadyExists = await knex('users').select('*').where({ email }).first();
-
-                if (checkIfEmailAlreadyExists) {
-                    return res.status(400).json({ message: 'O email já existe.' });
-                }
-            }
-        }
-
         if (password) {
             const updatedPassword = await bcrypt.hash(password, 10);
 
@@ -75,7 +51,11 @@ const updateProfile = async (req, res) => {
                 .update({
                     name,
                     email,
-                    password: updatedPassword
+                    cpf,
+                    cnpj,
+                    address,
+                    password: updatedPassword,
+                    groupcategory
                 })
                 .where('id', req.user.id);
 
@@ -90,7 +70,11 @@ const updateProfile = async (req, res) => {
             .update({
                 name,
                 email,
-                password
+                cpf,
+                cnpj,
+                address,
+                password,
+                groupcategory
             })
             .where('id', req.user.id);
 
