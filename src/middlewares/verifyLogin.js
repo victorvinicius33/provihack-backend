@@ -22,7 +22,18 @@ const verifyLogin = async (req, res, next) => {
 
         const { password, ...user } = loggedInUser;
 
-        req.user = user;
+        const formatedCPF = user.cpf !== null
+            ? user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")
+            : user.cpf;
+        const formatedCNPJ = user.cnpj !== null
+            ? user.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5")
+            : user.cnpj;
+
+        const formatedUser = user;
+        user.cpf = formatedCPF;
+        user.cnpj = formatedCNPJ;
+
+        req.user = formatedUser;
 
         next();
     } catch (error) {

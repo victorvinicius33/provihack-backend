@@ -23,11 +23,25 @@ const login = async (req, res) => {
             return res.status(400).json({ message: 'Email ou senha incorretos.' });
         }
 
-        const token = stayConnected 
-        ? jwt.sign({ id: user.id }, hashPassword) 
-        : jwt.sign({ id: user.id }, hashPassword, { expiresIn: '2h' });
+        const token = stayConnected
+            ? jwt.sign({ id: user.id }, hashPassword)
+            : jwt.sign({ id: user.id }, hashPassword, { expiresIn: '2h' });
 
-        const { password: _, ...userData } = user;
+        const formatedCPF = user.cpf !== null 
+            ? user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4") 
+            : user.cpf;
+        const formatedCNPJ = user.cnpj !== null 
+            ? user.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5")
+            : user.cnpj;
+
+        const formatedUser = user;
+        user.cpf = formatedCPF;
+        user.cnpj = formatedCNPJ;
+
+        const { 
+            password: _, 
+            ...userData 
+        } = formatedUser;
 
         return res.status(200).json({
             user: userData,
