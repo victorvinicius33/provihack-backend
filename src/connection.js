@@ -4,7 +4,10 @@ const knex = require('knex')({
         host: 'localhost',
         user: 'postgres',
         password: 'postgres',
-        database: 'provihack'
+        database: 'provihack',
+        ssl: {
+            rejectUnauthorized: false
+        }
     }
 });
 
