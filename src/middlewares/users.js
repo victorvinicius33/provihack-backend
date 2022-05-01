@@ -1,7 +1,10 @@
 const knex = require('../connection');
 
-const checkIfFieldsAreNull = async (req, res, next) => {
-    const { name, email, cpf, cnpj, address, password, groupcategory } = req.body;
+const checkIfFieldsAreNullInRegister = async (req, res, next) => {
+    const {
+        name, email, cpf, cnpj, password, groupcategory,
+        zip_code, address, house_number, complement
+    } = req.body;
 
     if (!name) {
         return res.status(404).json({ message: 'O campo nome é obrigatório.' });
@@ -15,8 +18,16 @@ const checkIfFieldsAreNull = async (req, res, next) => {
         return res.status(404).json({ message: 'Digite um CPF ou CNPJ.' });
     }
 
+    if (!zip_code) {
+        return res.status(404).json({ message: 'O campo cep é obrigatório.' });
+    }
+
     if (!address) {
         return res.status(404).json({ message: 'O campo endereço é obrigatório.' });
+    }
+
+    if (!house_number) {
+        return res.status(404).json({ message: `O campo 'N°' é obrigatório.` });
     }
 
     if (!password) {
@@ -24,10 +35,32 @@ const checkIfFieldsAreNull = async (req, res, next) => {
     }
 
     if (!groupcategory) {
-        return res.status(404).json({ message: 'Selecione a categoria do grupo ao qual você pertence.' });
+        return res.status(404).json({ message: 'Selecione o grupo ao qual você pertence.' });
     }
 
-    next()
+    next();
+}
+
+const checkFieldsInCreateProfile = async (req, res, next) => {
+    const { profile_image, user_description, telephone } = req.body;
+
+    if (!profile_image) {
+        return res.status(400).json({ message: 'Escolha uma foto para perfil.'});
+    }
+
+    if (!user_description) {
+        return res.status(400).json({ message: 'Digite uma descrição do seu trabalho.' });
+    }
+
+    if (!telephone) {
+        return res.status(400).json({ message: 'Digite um telefone.' });
+    }
+
+    if (telephone.length !== 13) {
+        return res.status(400).json({ message: 'Digite o DDD e o número com 9 dígitos do telefone.' });
+    } 
+
+    next();
 }
 
 const checkIfFieldsAlreadyExistsInRegister = async (req, res, next) => {
@@ -125,7 +158,8 @@ const checkIfFieldsAlreadyExistsInUpdate = async (req, res, next) => {
 }
 
 module.exports = {
-    checkIfFieldsAreNull,
+    checkIfFieldsAreNullInRegister,
     checkIfFieldsAlreadyExistsInRegister,
-    checkIfFieldsAlreadyExistsInUpdate
+    checkIfFieldsAlreadyExistsInUpdate,
+    checkFieldsInCreateProfile
 }

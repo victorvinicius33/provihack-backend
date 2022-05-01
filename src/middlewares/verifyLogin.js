@@ -17,7 +17,7 @@ const verifyLogin = async (req, res, next) => {
         const loggedInUser = await knex('users').where({ id }).first();
 
         if (!loggedInUser) {
-            return res.status(404).json('Usuario não encontrado');
+            return res.status(404).json('Usuário não encontrado.');
         }
 
         const { password, ...user } = loggedInUser;
@@ -33,7 +33,27 @@ const verifyLogin = async (req, res, next) => {
         user.cpf = formatedCPF;
         user.cnpj = formatedCNPJ;
 
-        req.user = formatedUser;
+        const userAddress = await knex('users_addresses')
+            .where({ email: user.email })
+            .returning('*')
+            .first();
+
+        const work_images = await knex('profile_images')
+            .where({ user_id: user.id })
+            .returning('*');
+
+        const profile_description = await knex('profile_description')
+            .where({ user_id: user.id })
+            .returning('*');
+
+        const allUserData = {
+            user_info: formatedUser,
+            address: userAddress,
+            work_images,
+            profile_description
+        }
+
+        req.user = allUserData;
 
         next();
     } catch (error) {
