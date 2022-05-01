@@ -2,7 +2,7 @@ const knex = require('../connection');
 
 const checkIfFieldsAreNullInRegister = async (req, res, next) => {
     const {
-        name, email, cpf, cnpj, password, groupcategory,
+        name, email, cpf_or_cnpj, password, groupcategory,
         zip_code, address, house_number, complement
     } = req.body;
 
@@ -14,7 +14,7 @@ const checkIfFieldsAreNullInRegister = async (req, res, next) => {
         return res.status(404).json({ message: 'O campo email é obrigatório.' });
     }
 
-    if (!cpf && !cnpj) {
+    if (!cpf_or_cnpj) {
         return res.status(404).json({ message: 'Digite um CPF ou CNPJ.' });
     }
 
@@ -64,7 +64,7 @@ const checkFieldsInCreateProfile = async (req, res, next) => {
 }
 
 const checkIfFieldsAlreadyExistsInRegister = async (req, res, next) => {
-    const { email, cpf, cnpj } = req.body;
+    const { email, cpf_or_cnpj } = req.body;
 
     try {
         const emailAlreadyExists = await knex('users')
@@ -76,27 +76,15 @@ const checkIfFieldsAlreadyExistsInRegister = async (req, res, next) => {
             return res.status(400).json({ message: 'Email já cadastrado.' });
         }
 
-        if (cpf) {
-            const cpfAlreadyExists = await knex('users')
-                .whereNotNull('cpf')
-                .where('cpf', cpf)
+        if (cpf_or_cnpj) {
+            const cpfOrCpnjAlreadyExists = await knex('users')
+                .whereNotNull('cpf_or_cnpj')
+                .where('cpf_or_cnpj', cpf_or_cnpj)
                 .returning('*')
                 .first();
 
-            if (cpfAlreadyExists) {
+            if (cpfOrCpnjAlreadyExists) {
                 return res.status(400).json({ message: 'CPF já cadastrado.' });
-            }
-        }
-
-        if (cnpj) {
-            const cnpjAlreadyExists = await knex('users')
-                .whereNotNull('cnpj')
-                .where('cnpj', cnpj)
-                .returning('*')
-                .first();
-
-            if (cnpjAlreadyExists) {
-                return res.status(400).json({ message: 'CNPJ já cadastrado.' });
             }
         }
 
@@ -107,7 +95,7 @@ const checkIfFieldsAlreadyExistsInRegister = async (req, res, next) => {
 }
 
 const checkIfFieldsAlreadyExistsInUpdate = async (req, res, next) => {
-    const { email, cpf, cnpj } = req.body;
+    const { email, cpf_or_cnpj } = req.body;
 
     try {
         if (email) {
@@ -123,29 +111,18 @@ const checkIfFieldsAlreadyExistsInUpdate = async (req, res, next) => {
             }
         }
 
-        if (cpf) {
-            if (cpf !== req.user.cpf) {
-                const cpfAlreadyExists = await knex('users')
-                    .whereNotNull('cpf')
-                    .where('cpf', cpf)
+        if (cpf_or_cnpj) {
+            if (cpf_or_cnpj !== req.user.cpf_or_cnpj) {
+                const cpfOrCnpjAlreadyExists = await knex('users')
+                    .whereNotNull('cpf_or_cnpj')
+                    .where('cpf_or_cnpj', cpf_or_cnpj)
                     .returning('*')
                     .first();
     
-                if (cpfAlreadyExists) {
-                    return res.status(400).json({ message: 'CPF já cadastrado.' });
-                }
-            }
-        }
-
-        if (cnpj) {
-            if (cnpj !== req.user.cnpj) {
-                const cnpjAlreadyExists = await knex('users')
-                    .whereNotNull('cnpj')
-                    .where('cnpj', cnpj)
-                    .returning('*')
-                    .first();
-    
-                if (cnpjAlreadyExists) {
+                if (cpfOrCnpjAlreadyExists) {
+                    if (cpfOrCnpjAlreadyExists.length === 11) {
+                        return res.status(400).json({ message: 'CPF já cadastrado.' });
+                    }
                     return res.status(400).json({ message: 'CNPJ já cadastrado.' });
                 }
             }

@@ -2,9 +2,9 @@ const bcrypt = require('bcrypt');
 const knex = require('../connection');
 
 const registerUser = async (req, res) => {
-    const { 
-        name, email, cpf, cnpj, password, groupcategory, 
-        zip_code, address, house_number, complement 
+    const {
+        name, email, cpf_or_cnpj, password, groupcategory,
+        zip_code, address, house_number, complement
     } = req.body;
 
     try {
@@ -12,10 +12,9 @@ const registerUser = async (req, res) => {
 
         const newUser = await knex('users')
             .insert({
-                name, 
-                email, 
-                cpf, 
-                cnpj, 
+                name,
+                email,
+                cpf_or_cnpj,
                 password: encryptedPassword,
                 groupcategory
             })
@@ -23,8 +22,8 @@ const registerUser = async (req, res) => {
 
         const adressNewUser = await knex('users_addresses')
             .insert({
-                zip_code,
                 email,
+                zip_code,
                 address,
                 house_number,
                 complement,
@@ -70,10 +69,10 @@ const createProfileInfo = async (req, res) => {
 }
 
 const updateProfile = async (req, res) => {
-    const { name, email, cpf, cnpj, address, password, groupcategory } = req.body;
+    const { name, email, cpf_or_cnpj, address, password, groupcategory } = req.body;
     const { user_info } = req.user;
 
-    if (!name && !email && !cpf && !cnpj && !address && !password && !groupcategory) {
+    if (!name && !email && cpf_or_cnpj && !address && !password && !groupcategory) {
         return res.status(404).json({ message: 'É obrigatório informar ao menos um campo para atualização.' });
     }
 
@@ -91,13 +90,18 @@ const updateProfile = async (req, res) => {
                 .update({
                     name,
                     email,
-                    cpf,
-                    cnpj,
+                    cpf_or_cnpj,
                     address,
                     password: updatedPassword,
                     groupcategory
                 })
                 .where('id', req.user.user_info.id);
+
+            const updateEmailAdress = await knex('users_addresses')
+                .update({
+                    email  
+                })
+                .where('email', req.user.user_info.email);
 
             if (!updatedUser) {
                 return res.status(200), json({ message: 'Não foi possível atualizar o usuário.' });
@@ -110,8 +114,7 @@ const updateProfile = async (req, res) => {
             .update({
                 name,
                 email,
-                cpf,
-                cnpj,
+                cpf_or_cnpj,
                 address,
                 password,
                 groupcategory
@@ -132,7 +135,21 @@ const deleteUser = async (req, res) => {
     const { user_info } = req.user;
 
     try {
-        const userDeleted = await knex('users').delete().where({ id: user_info.id });
+        const profileDeleted = await knex('profile_description')
+            .delete()
+            .where({ user_id: user_info.id });
+
+        const userAddressDeleted = await knex('users_addresses')
+            .delete()
+            .where({ email: user_info.email });
+        
+        const profileImagesDeleted = await knex('profile_images')
+            .delete()
+            .where({ user_id: user_info.id });
+
+        const userDeleted = await knex('users')
+            .delete()
+            .where({ id: user_info.id });
 
         if (!userDeleted) {
             return res.status(400).json({ message: 'Não foi possível excluir o usuário.' });

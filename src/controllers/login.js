@@ -27,16 +27,12 @@ const login = async (req, res) => {
             ? jwt.sign({ id: user.id }, hashPassword)
             : jwt.sign({ id: user.id }, hashPassword, { expiresIn: '2h' });
 
-        const formatedCPF = user.cpf !== null 
-            ? user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4") 
-            : user.cpf;
-        const formatedCNPJ = user.cnpj !== null 
-            ? user.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5")
-            : user.cnpj;
+        const formatedCPFOrCNPJ = user.cpf_or_cnpj.length === 11
+            ? user.cpf_or_cnpj.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")
+            : user.cpf_or_cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
 
         const formatedUser = user;
-        user.cpf = formatedCPF;
-        user.cnpj = formatedCNPJ;
+        formatedUser.cpf_or_cnpj = formatedCPFOrCNPJ;
 
         const { 
             password: _, 

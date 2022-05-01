@@ -4,8 +4,7 @@ CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   name text NOT NULL,
   email text NOT NULL UNIQUE,
-  cpf varchar(11) UNIQUE,
-  cnpj varchar(14) UNIQUE,
+  cpfOrCnpj text UNIQUE,
   password text NOT NULL,
   groupcategory text NOT NULL
 );

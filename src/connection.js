@@ -1,4 +1,4 @@
-const knex = require('knex')({
+/* const knex = require('knex')({
     client: 'pg',
     connection: {
         host: 'ec2-34-194-73-236.compute-1.amazonaws.com',
@@ -9,6 +9,17 @@ const knex = require('knex')({
         ssl: {
             rejectUnauthorized: false
         }
+    }
+}); */
+
+const knex = require('knex')({
+    client: 'pg',
+    connection: {
+        host: 'localhost',
+        user: 'postgres',
+        password: 'Sa2123465',
+        database: 'provihack',
+        port: 5432
     }
 });
 
