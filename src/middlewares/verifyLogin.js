@@ -6,7 +6,7 @@ const verifyLogin = async (req, res, next) => {
     const { authorization } = req.headers;
 
     if (!authorization) {
-        return res.status(401).json('Não autorizado');
+        return res.status(401).json('Não autorizado.');
     }
 
     try {

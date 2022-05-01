@@ -7,14 +7,14 @@ const login = async (req, res) => {
     const { email, password, stayConnected } = req.body;
 
     if (!email || !password) {
-        return res.status(404).json({ message: 'É obrigatório email e senha' });
+        return res.status(400).json({ message: 'É obrigatório email e senha' });
     }
 
     try {
         const user = await knex('users').where('email', email).returning('*').first();
 
         if (!user) {
-            return res.status(400).json({ message: 'O usuario não foi encontrado' });
+            return res.status(404).json({ message: 'O usuario não foi encontrado' });
         }
 
         const correctPassword = await bcrypt.compare(password, user.password);

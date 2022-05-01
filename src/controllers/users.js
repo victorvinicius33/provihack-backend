@@ -62,7 +62,7 @@ const createProfileInfo = async (req, res) => {
                 .returning('*');
         }
 
-        return res.status(200).json({ message: 'Perfil criado com sucesso!' });
+        return res.status(201).json({ message: 'Perfil criado com sucesso!' });
     } catch (error) {
         return res.status(400).json(error.message);
     }
@@ -73,14 +73,14 @@ const updateProfile = async (req, res) => {
     const { user_info } = req.user;
 
     if (!name && !email && cpf_or_cnpj && !address && !password && !groupcategory) {
-        return res.status(404).json({ message: 'É obrigatório informar ao menos um campo para atualização.' });
+        return res.status(400).json({ message: 'É obrigatório informar ao menos um campo para atualização.' });
     }
 
     try {
         const user = await knex('users').where({ id: user_info.id }).first();
 
         if (!user) {
-            return res.status(400).json({ message: 'Não foi possível encontrar o usuário.' });
+            return res.status(404).json({ message: 'Não foi possível encontrar o usuário.' });
         }
 
         if (password) {
@@ -104,10 +104,10 @@ const updateProfile = async (req, res) => {
                 .where('email', req.user.user_info.email);
 
             if (!updatedUser) {
-                return res.status(200), json({ message: 'Não foi possível atualizar o usuário.' });
+                return res.status(400), json({ message: 'Não foi possível atualizar o usuário.' });
             }
 
-            return res.status(200).json({ message: 'Usuário foi atualizado com sucesso.' });
+            return res.status(201).json({ message: 'Usuário foi atualizado com sucesso.' });
         }
 
         const updatedUser = await knex('users')
@@ -122,10 +122,10 @@ const updateProfile = async (req, res) => {
             .where('id', req.user.user_info.id);
 
         if (!updatedUser) {
-            return res.status(200), json({ message: 'Não foi possível atualizar o usuário.' });
+            return res.status(400), json({ message: 'Não foi possível atualizar o usuário.' });
         }
 
-        return res.status(200).json({ message: 'Usuário foi atualizado com sucesso.' });
+        return res.status(201).json({ message: 'Usuário foi atualizado com sucesso.' });
     } catch (error) {
         return res.status(400).json(error.message);
     }

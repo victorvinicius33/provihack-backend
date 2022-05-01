@@ -7,35 +7,35 @@ const checkIfFieldsAreNullInRegister = async (req, res, next) => {
     } = req.body;
 
     if (!name) {
-        return res.status(404).json({ message: 'O campo nome é obrigatório.' });
+        return res.status(400).json({ message: 'O campo nome é obrigatório.' });
     }
 
     if (!email) {
-        return res.status(404).json({ message: 'O campo email é obrigatório.' });
+        return res.status(400).json({ message: 'O campo email é obrigatório.' });
     }
 
     if (!cpf_or_cnpj) {
-        return res.status(404).json({ message: 'Digite um CPF ou CNPJ.' });
+        return res.status(400).json({ message: 'Digite um CPF ou CNPJ.' });
     }
 
     if (!zip_code) {
-        return res.status(404).json({ message: 'O campo cep é obrigatório.' });
+        return res.status(400).json({ message: 'O campo cep é obrigatório.' });
     }
 
     if (!address) {
-        return res.status(404).json({ message: 'O campo endereço é obrigatório.' });
+        return res.status(400).json({ message: 'O campo endereço é obrigatório.' });
     }
 
     if (!house_number) {
-        return res.status(404).json({ message: `O campo 'N°' é obrigatório.` });
+        return res.status(400).json({ message: `O campo 'N°' é obrigatório.` });
     }
 
     if (!password) {
-        return res.status(404).json({ message: 'O campo senha é obrigatório.' });
+        return res.status(400).json({ message: 'O campo senha é obrigatório.' });
     }
 
     if (!groupcategory) {
-        return res.status(404).json({ message: 'Selecione o grupo ao qual você pertence.' });
+        return res.status(400).json({ message: 'Selecione o grupo ao qual você pertence.' });
     }
 
     next();
