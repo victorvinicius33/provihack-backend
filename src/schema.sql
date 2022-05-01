@@ -14,12 +14,11 @@ DROP TABLE IF EXISTS users_addresses;
 
 CREATE TABLE users_addresses (
   id SERIAL PRIMARY KEY,
-  user_id integer NOT NULL,
+  email text NOT NULL,
   zip_code varchar(8) NOT NULL,
   address varchar(100) NOT NULL,
   house_number varchar(20) NOT NULL,
-  complement varchar(100),
-  foreign key (user_id) REFERENCES users (id)
+  complement varchar(100)
 );
 
 DROP TABLE IF EXISTS profile_images;
